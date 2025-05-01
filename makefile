@@ -4,7 +4,8 @@ CC = gcc
 SRC = src/main.c \
       src/menu.c \
       src/opciones.c \
-      src/stackManager.c
+      src/stackManager.c \
+      src/puntuaciones.c
 
 BUILD_DIR = build
 TARGET = $(BUILD_DIR)/mi_app

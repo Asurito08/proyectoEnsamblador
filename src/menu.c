@@ -1,6 +1,7 @@
 #include "menu.h"
 #include "stackManager.h"
 
+//Funcion para crear botones de cambio de pantalla
 static GtkWidget* crearBotonMenu(const char *rutaImagen, const char *pantallaDestino) {
     GtkWidget *boton = gtk_button_new();
     GtkWidget *imagen = gtk_picture_new_for_filename(rutaImagen);
@@ -16,7 +17,7 @@ static GtkWidget* crearBotonMenu(const char *rutaImagen, const char *pantallaDes
     return boton;
 }
 
-
+//Funcion para crear la pantalla menu, con todo su contenido adentro
 GtkWidget* crearMenu(void) {
     GtkWidget *overlayMenu = gtk_overlay_new();
     gtk_widget_set_hexpand(overlayMenu, TRUE);
@@ -26,6 +27,7 @@ GtkWidget* crearMenu(void) {
     gtk_widget_set_halign(cajaMenu, GTK_ALIGN_CENTER);
     gtk_widget_set_valign(cajaMenu, GTK_ALIGN_CENTER);
 
+    //Insertando la imagen de titulo
     GtkWidget *imagenTitulo = gtk_picture_new_for_filename("design/elementos/titulo.svg");
     gtk_widget_set_size_request(imagenTitulo, 600, 250);
     gtk_picture_set_content_fit(GTK_PICTURE(imagenTitulo), GTK_CONTENT_FIT_CONTAIN);

@@ -1,11 +1,13 @@
 #include "opciones.h"
 #include "stackManager.h"
 
+//Funcion momentanea para mostar que los botones de las naves si funcioan
 static void seleccionarNave(GtkButton *boton, gpointer datosUsuario) {
     const char *nombreNave = (const char *)datosUsuario;
     g_print("%s ha sido escogida\n", nombreNave);
 }
 
+//Funcion para crear la pantalla de opciones y agregarle su contenido
 GtkWidget* crearPantallaOpciones(void) {
     GtkWidget *overlayOpciones = gtk_overlay_new();
     gtk_widget_set_hexpand(overlayOpciones, TRUE);
@@ -15,10 +17,12 @@ GtkWidget* crearPantallaOpciones(void) {
     gtk_widget_set_halign(cajaOpciones, GTK_ALIGN_CENTER);
     gtk_widget_set_valign(cajaOpciones, GTK_ALIGN_CENTER);
 
-    // ----- SECCIÓN SONIDO CON FONDO -----
+    //Se agrega la caja de sonido
+
     GtkWidget *seccionSonido = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     gtk_widget_set_halign(seccionSonido, GTK_ALIGN_CENTER);
 
+    
     GtkWidget *overlaySonido = gtk_overlay_new();
     gtk_widget_set_size_request(overlaySonido, 600, 250);
 
@@ -33,6 +37,7 @@ GtkWidget* crearPantallaOpciones(void) {
     gtk_widget_set_halign(controlSonido, GTK_ALIGN_CENTER);
     gtk_widget_set_valign(controlSonido, GTK_ALIGN_CENTER);
 
+    //Se pone el slider para regular el sonido
     GtkWidget *sliderVolumen = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL, 0, 100, 1);
     gtk_widget_set_size_request(sliderVolumen, 300, -1);
     gtk_range_set_value(GTK_RANGE(sliderVolumen), 60);
@@ -42,7 +47,7 @@ GtkWidget* crearPantallaOpciones(void) {
     gtk_box_append(GTK_BOX(seccionSonido), overlaySonido);
     gtk_box_append(GTK_BOX(cajaOpciones), seccionSonido);
 
-    // ----- SECCIÓN NAVE CON FONDO -----
+    //Se crea la seccion de naves
     GtkWidget *seccionNaves = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     gtk_widget_set_halign(seccionNaves, GTK_ALIGN_CENTER);
 
@@ -60,6 +65,7 @@ GtkWidget* crearPantallaOpciones(void) {
     gtk_widget_set_halign(filaNaves, GTK_ALIGN_CENTER);
     gtk_widget_set_valign(filaNaves, GTK_ALIGN_CENTER);
 
+    //se crean e introducen los botones de las naves
     for (int i = 1; i <= 4; i++) {
         char ruta[100];
         char nombre[20];
@@ -85,7 +91,7 @@ GtkWidget* crearPantallaOpciones(void) {
     gtk_box_append(GTK_BOX(seccionNaves), overlayNaves);
     gtk_box_append(GTK_BOX(cajaOpciones), seccionNaves);
 
-    // ----- BOTÓN VOLVER -----
+    //Se crea la flecha para volver a la pantalla principal
     GtkWidget *botonVolver = gtk_button_new();
     gtk_widget_set_size_request(botonVolver, 60, 60);
 
