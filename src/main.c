@@ -28,7 +28,7 @@ static void activate(GtkApplication *aplicacion, gpointer datosUsuario) {
     GtkWidget *overlay = gtk_overlay_new();
     gtk_window_set_child(GTK_WINDOW(ventanaPrincipal), overlay);
 
-    GtkWidget *fondo = gtk_picture_new_for_filename("design/elementos/fondo3.jpeg");
+    GtkWidget *fondo = gtk_picture_new_for_filename("design/elementos/fondo.jpeg");
     gtk_widget_set_hexpand(fondo, TRUE);
     gtk_widget_set_vexpand(fondo, TRUE);
     gtk_picture_set_content_fit(GTK_PICTURE(fondo), GTK_CONTENT_FIT_COVER);

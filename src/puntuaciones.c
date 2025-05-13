@@ -31,7 +31,7 @@ static GtkWidget* crearColumnaPuntuacion(GtkWidget **contenedorInterno) {
 
 //funcion para cargar nombres y puntuaciones
 static void cargarPuntuaciones(GtkWidget *nombresBox, GtkWidget *puntosBox) {
-    FILE *archivo = fopen("src/puntuaciones.txt", "r");
+    FILE *archivo = fopen("saves/puntuaciones.txt", "r");
     if (!archivo) return;
 
     char nombre[100];
