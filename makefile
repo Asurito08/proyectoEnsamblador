@@ -32,3 +32,14 @@ run: $(TARGET)
 # Limpiar
 clean:
 	rm -rf $(BUILD_DIR) $(BIN_DIR)
+
+
+# Compilar y correr el archivo nasm para pruebas
+nasm:
+	mkdir -p $(BIN_DIR)
+	mkdir -p $(BUILD_DIR)
+	nasm -f elf64 $(SRC_DIR)/matrizElementos.asm -o $(BUILD_DIR)/matrizElementos.o
+	ld $(BUILD_DIR)/matrizElementos.o -o $(BIN_DIR)/matrizElementos
+
+runasm:
+	./$(BIN_DIR)/matrizElementos
