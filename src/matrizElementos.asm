@@ -1,30 +1,22 @@
 section .data
-    ; Nombre del archivo
     filename db "saves/nivel.txt", 0
-    ; Datos relacionados a la matriz
     rows equ 7
     cols equ 9
     totalBytes equ rows * (cols + 1)
-
-    ; Datos relacionados a la secuencia ansi para limpiar la pantalla
     clearScreen db 27, '[', '2', 'J', 27, '[', 'H'
     clearLen equ $ - clearScreen
 
-    ; Indicaciones para esperar
-    timespec:
-        dq 0
-        dq 100000000
-
 section .bss
+    tecla resb 1
     matriz resb totalBytes
 
 section .text
     global _start
 
-_start:
-    ; Índice para mantener el bucle
-    xor r8, r8
+%define STDIN 0
+%define STDOUT 1
 
+_start:
     ; Abrir archivo
     mov rax, 2
     mov rdi, filename
@@ -45,22 +37,51 @@ _start:
     mov rdi, r12
     syscall
 
-    buclePrincipal:
-        ; Limpiar pantalla con ANSI
-        mov rax, 1
-        mov rdi, 1
-        mov rsi, clearScreen
-        mov rdx, clearLen
-        syscall
+bucle:
+    ; Limpiar pantalla
+    mov rax, 1
+    mov rdi, STDOUT
+    mov rsi, clearScreen
+    mov rdx, clearLen
+    syscall
 
-        ; Imprimir matriz
-        mov rax, 1
-        mov rdi, 1
-        mov rsi, matriz
-        mov rdx, totalBytes
-        syscall
+    ; Imprimir matriz
+    mov rax, 1
+    mov rdi, STDOUT
+    mov rsi, matriz
+    mov rdx, totalBytes
+    syscall
+
+    ; Leer una tecla
+    mov rax, 0
+    mov rdi, STDIN
+    mov rsi, tecla
+    mov rdx, 1
+    syscall
+    cmp rax, 0
+    jl error
+
+    ; Verificar si es 'q'
+    mov al, [tecla]
+    cmp al, 'q'
+    je salir
+
+    ; Verificar si es 'a'
+    mov al, [tecla]
+    cmp al, 'a'
+    je teclaA
+
+    jmp bucle
+
+teclaA:
+    
 
 salir:
     mov rax, 60
     xor rdi, rdi
+    syscall
+
+error:
+    mov rax, 60
+    mov rdi, 1
     syscall
