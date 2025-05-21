@@ -104,6 +104,23 @@ Paso 7 Correr el Programa:
 
 Con esto deberías poder correr el programa completo y sin problemas.
 
+Para agilizar el proceso puedes utilizar el siguiente script para configurar tu entorno de desarrollo ya dentro de tu VM.
+
+Paso 1: Clona el repositorio
+
+git clone https://github.com/Asurito08/proyectoEnsamblador.git
+cd proyectoEnsamblador
+
+Paso 2: Da parmisos al script
+
+chmod +x setup.sh
+
+Paso 3: Ejecuta el script
+
+./setup.sh
+
+Recuerda que si el repositorio es privado deberás ingresar tus credenciales de github.
+
 Link para ingresar al BackLog del programa, en el se muestran las tareas necesarias para la realización del proyecto, el tipo, su estado y quien las realizó.
 
 https://docs.google.com/spreadsheets/d/1rnS4CC7ipi95lkOOzpidVt0FUUKvtdAPmcvlYVH6kB8/edit?usp=sharing
