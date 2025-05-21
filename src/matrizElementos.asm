@@ -111,7 +111,7 @@ nextRow:
 foundV:
     ret
 
-; Moverse a la izqquierda si está en rango
+; Moverse a la izquierda si está en rango
 moveLeft:
     call findV
     cmp byte [index + 1], 0
@@ -131,7 +131,7 @@ moveLeft:
     cmp al, 'X'
     je youLost
 
-    ; Mover X a la izquierda
+    ; Mover V a la izquierda
     mov cl, [rbx]
     mov al, [rbx - 1]
     mov [rbx], al
@@ -158,7 +158,7 @@ moveRight:
     cmp al, 'X'
     je youLost
 
-    ; Mover a la derecha
+    ; Mover V a la derecha
     mov cl, [rbx]
     mov al, [rbx + 1]
     mov [rbx], al
