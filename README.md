@@ -103,3 +103,7 @@ Paso 7 Correr el Programa:
 -Esto debería compilarte el programa, creando un ejecutable y  luego ejecutar el archivo que acaba de generar.
 
 Con esto deberías poder correr el programa completo y sin problemas.
+
+Link para ingresar al BackLog del programa, en el se muestran las tareas necesarias para la realización del proyecto, el tipo, su estado y quien las realizó.
+
+https://docs.google.com/spreadsheets/d/1rnS4CC7ipi95lkOOzpidVt0FUUKvtdAPmcvlYVH6kB8/edit?usp=sharing
