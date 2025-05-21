@@ -3,6 +3,7 @@
 #include "menu.h"
 #include "opciones.h"
 #include "puntuaciones.h"
+#include "nombreJugador.h"
 
 GtkCssProvider *cssProvider = NULL;
 
@@ -44,6 +45,7 @@ static void activate(GtkApplication *aplicacion, gpointer datosUsuario) {
     gtk_stack_add_named(GTK_STACK(stack), crearMenu(), "menu");
     gtk_stack_add_named(GTK_STACK(stack), crearPantallaOpciones(), "opciones");
     gtk_stack_add_named(GTK_STACK(stack), crearPantallaPuntuaciones(), "puntuaciones");
+    gtk_stack_add_named(GTK_STACK(stack), crearPantallaNombreJugador(), "nombreJugador");
 
     // Mostrar ventana
     gtk_window_present(GTK_WINDOW(ventanaPrincipal));

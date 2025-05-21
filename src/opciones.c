@@ -1,7 +1,7 @@
 #include "opciones.h"
 #include "stackManager.h"
 
-//Funcion momentanea para mostar que los botones de las naves si funcioan
+//Funcion momentanea para mostar que los botones de las naves si funcionan
 static void seleccionarNave(GtkButton *boton, gpointer datosUsuario) {
     const char *nombreNave = (const char *)datosUsuario;
     g_print("%s ha sido escogida\n", nombreNave);

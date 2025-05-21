@@ -39,7 +39,7 @@ GtkWidget* crearMenu(void) {
     gtk_widget_set_margin_top(cajaBotones, 70);
 
     // Creando los botones de cambios de pantalla
-    gtk_box_append(GTK_BOX(cajaBotones), crearBotonMenu("design/elementos/iniciarPartida.svg", "iniciar"));
+    gtk_box_append(GTK_BOX(cajaBotones), crearBotonMenu("design/elementos/iniciarPartida.svg", "nombreJugador"));
     gtk_box_append(GTK_BOX(cajaBotones), crearBotonMenu("design/elementos/puntuaciones.svg", "puntuaciones"));
     gtk_box_append(GTK_BOX(cajaBotones), crearBotonMenu("design/elementos/opciones.svg", "opciones"));
 
