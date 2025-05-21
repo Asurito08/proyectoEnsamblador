@@ -1,7 +1,20 @@
-/* style.css */
-.rojo {
-    color: red;
+.formato {
+    font-family: 'C059', serif;
+    font-size: 40px;
     font-weight: bold;
-    font-size: 70px;
-    font-family: "Courier New", monospace;
+    color: #305c38;
+
+    text-shadow:
+        -2px -2px 0 #e03b00,
+         0px -2px 0 #e03b00,
+         2px -2px 0 #e03b00,
+        -2px  0px 0 #e03b00,
+         2px  0px 0 #e03b00,
+        -2px  2px 0 #e03b00,
+         0px  2px 0 #e03b00,
+         2px  2px 0 #e03b00,
+        -1px -1px 0 #e03b00,
+         1px -1px 0 #e03b00,
+        -1px  1px 0 #e03b00,
+         1px  1px 0 #e03b00;
 }
