@@ -37,30 +37,6 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 run: $(TARGET)
 	./$(TARGET)
 
-# ========== Parte NASM ==========
-
-# Compilar ensamblador
-$(ASM_OBJ): $(ASM_SRC)
-	mkdir -p $(BUILD_DIR)
-	$(NASM) -f elf64 $< -o $@
-
-# Linkear ensamblador
-$(ASM_BIN): $(ASM_OBJ)
-	mkdir -p $(BIN_DIR)
-	ld $< -o $@
-
-# Compilar wrapper C
-$(WRAPPER_BIN): $(WRAPPER_SRC) $(ASM_BIN)
-	mkdir -p $(BIN_DIR)
-	$(CC) $< -o $@
-
-# Compilar NASM + C
-nasm: $(WRAPPER_BIN)
-
-# Ejecutar ensamblador mediante wrapper
-runasm: nasm
-	./$(WRAPPER_BIN)
-
 # Limpiar todo
 clean:
 	rm -rf $(BUILD_DIR) $(BIN_DIR)

@@ -1,232 +1,220 @@
-section .data
-    fileName db "saves/nivel.txt", 0
-    rows equ 7
-    cols equ 9
-    totalBytes equ rows * (cols + 1) ; +1 Para almacenar el cambio de línea directamente
-    clearScreen db 27, '[', '2', 'J', 27, '[', 'H'
-    clearLen equ $ - clearScreen
-    loseMsg db "You lost", 10
-    loseLen equ $ - loseMsg
-
-section .bss
-    key resb 1
-    matrix resb totalBytes
-    index resb 2 ; index[0] = row, index[1] = col
-
 section .text
-    global _start
+global iterar_matriz
 
-%define STDIN 0
-%define STDOUT 1
+%define ROWS 7
+%define COLS 9
+%define ROWLEN 10
 
-_start:
-    ; Abrir archivo
-    mov rax, 2
-    mov rdi, fileName
-    xor rsi, rsi
-    xor rdx, rdx
-    syscall
-    mov r12, rax
+; Entradas:
+;   rdi → matriz (char *)
+;   rsi → tecla (char)
+; Salidas:
+;   eax = 0 → acción válida
+;   eax = 1 → alguna X destruida
+;   eax = -1 → acción inválida
 
-    ; Leer archivo
-    mov rax, 0
-    mov rdi, r12
-    mov rsi, matrix
-    mov rdx, totalBytes
-    syscall
+iterar_matriz:
+    ; Buscar 'V'
+    xor rcx, rcx          ; fila
+buscar_fila:
+    cmp rcx, ROWS
+    jge no_move
 
-    ; Cerrar Archivo
-    mov rax, 3
-    mov rdi, r12
-    syscall
+    xor rdx, rdx          ; columna
+buscar_col:
+    cmp rdx, COLS
+    jge siguiente_fila
 
-mainLoop:
-    ; Limpiar pantalla
-    mov rax, 1
-    mov rdi, STDOUT
-    mov rsi, clearScreen
-    mov rdx, clearLen
-    syscall
-
-    ; Imprimir matriz
-    mov rax, 1
-    mov rdi, STDOUT
-    mov rsi, matrix
-    mov rdx, totalBytes
-    syscall
-
-    ; Leer tecla
-    mov rax, 0
-    mov rdi, STDIN
-    mov rsi, key
-    mov rdx, 1
-    syscall
-    cmp rax, 0
-
-    ; Comparar la tecla
-    mov al, [key]
-    cmp al, 'q'
-    je gameQuit
-    cmp al, 'a'
-    je moveLeft
-    cmp al, 'd'
-    je moveRight
-    cmp al, 'w'
-    je moveUp
-    cmp al, 's'
-    je moveDown
-
-    jmp mainLoop
-
-; Almacenar la posición del personaje en row y col
-findV:
-    xor al, al
-    mov [index], al
-searchRow:
-    cmp byte [index], rows
-    xor al, al
-    mov [index + 1], al
-searchCol:
-    cmp byte [index + 1], cols
-    jge nextRow
-
-    ; Calcular el índice total
-    movzx rax, byte [index]
-    imul rdx, rax, cols + 1
-    movzx rax, byte [index + 1]
-    add rdx, rax
-
-    ; Verificar si es la V
-    mov al, [matrix + rdx]
+    mov r8, rcx
+    imul r9, r8, ROWLEN
+    add r9, rdx
+    mov al, [rdi + r9]
     cmp al, 'V'
-    je foundV
+    je encontrada_v
 
-    inc byte [index + 1]
-    jmp searchCol
+    inc rdx
+    jmp buscar_col
 
-nextRow:
-    inc byte [index]
-    jmp searchRow
+siguiente_fila:
+    inc rcx
+    jmp buscar_fila
 
-foundV:
+encontrada_v:
+    mov r10, r9           ; índice actual de 'V'
+    mov r11, rcx          ; fila actual
+    mov r12, rdx          ; columna actual
+
+    mov al, sil
+    cmp al, 'w'
+    je mover_arriba
+    cmp al, 's'
+    je mover_abajo
+    cmp al, 'a'
+    je mover_izquierda
+    cmp al, 'd'
+    je mover_derecha
+    cmp al, 'k'
+    je disparar_arriba
+    cmp al, 'p'
+    je mover_balas
+
+    jmp no_move
+
+mover_arriba:
+    test r11, r11
+    je no_move
+    dec r11
+    jmp calcular_nueva_pos
+
+mover_abajo:
+    cmp r11, ROWS - 1
+    jge no_move
+    inc r11
+    jmp calcular_nueva_pos
+
+mover_izquierda:
+    test r12, r12
+    je no_move
+    dec r12
+    jmp calcular_nueva_pos
+
+mover_derecha:
+    cmp r12, COLS - 1
+    jge no_move
+    inc r12
+
+calcular_nueva_pos:
+    mov r13, r11
+    imul r13, ROWLEN
+    add r13, r12
+
+    mov al, [rdi + r13]
+    cmp al, 'X'
+    je eliminar_x
+
+    mov byte [rdi + r13], 'V'
+    mov byte [rdi + r10], '0'
+
+    ; mover las balas luego de un movimiento válido
+    push rdi
+    call mover_balas
+    pop rdi
+
+    mov eax, 0
     ret
 
-; Moverse a la izquierda si está en rango
-moveLeft:
-    call findV
-    cmp byte [index + 1], 0
-    je mainLoop
+eliminar_x:
+    mov byte [rdi + r13], 'V'
+    mov byte [rdi + r10], '0'
 
-    ; Conseguir el índice total actual
-    movzx rax, byte [index]
-    imul rdx, rax, cols + 1
-    movzx rax, byte [index + 1]
-    add rdx, rax
+    ; mover las balas luego de un movimiento válido
+    push rdi
+    call mover_balas
+    pop rdi
 
-    mov rbx, matrix
-    add rbx, rdx
+    mov eax, 1
+    ret
 
-    ; Verificar si hay una X
-    mov al, [rbx - 1]
+disparar_arriba:
+    test r11, r11
+    je no_move
+
+    dec r11
+    mov r13, r11
+    imul r13, ROWLEN
+    add r13, r12
+
+    mov al, [rdi + r13]
     cmp al, 'X'
-    je youLost
+    je disparo_exitoso
 
-    ; Mover V a la izquierda
-    mov cl, [rbx]
-    mov al, [rbx - 1]
-    mov [rbx], al
-    mov [rbx - 1], cl
-    jmp mainLoop
+    cmp al, '0'
+    je colocar_bala
 
-; Mover a la derecha si está en rango
-moveRight:
-    call findV
-    mov al, [index + 1]
-    cmp al, cols - 1
-    jae mainLoop
+    mov eax, -1
+    ret
 
-    movzx rax, byte [index]
-    imul rdx, rax, cols + 1
-    movzx rax, byte [index + 1]
-    add rdx, rax
+colocar_bala:
+    mov byte [rdi + r13], '^'
+    mov eax, 0
+    ret
 
-    mov rbx, matrix
-    add rbx, rdx
+disparo_exitoso:
+    mov byte [rdi + r13], '0'
 
-    ; Verificar si hay una X
-    mov al, [rbx + 1]
-    cmp al, 'X'
-    je youLost
+    ; mover balas tras disparar
+    push rdi
+    call mover_balas
+    pop rdi
 
-    ; Mover V a la derecha
-    mov cl, [rbx]
-    mov al, [rbx + 1]
-    mov [rbx], al
-    mov [rbx + 1], cl
-    jmp mainLoop
+    mov eax, 1
+    ret
 
-; Moverse hacia arriba si está en rango
-moveUp:
-    call findV
-    cmp byte [index], 0
-    je mainLoop
+mover_balas:
+    mov rax, 0
+    mov rcx, 0
+bala_fila:
+    cmp rcx, ROWS
+    jge fin_balas
+    mov rdx, 0
+bala_col:
+    cmp rdx, COLS
+    jge sig_bala_fila
 
-    movzx rax, byte [index]
-    imul rdx, rax, cols + 1
-    movzx rax, byte [index + 1]
-    add rdx, rax
+    mov r8, rcx
+    imul r9, r8, ROWLEN
+    add r9, rdx
 
-    mov rbx, matrix
-    add rbx, rdx
+    mov al, [rdi + r9]
+    cmp al, '^'
+    jne siguiente_bala
 
-    ; Calcular el índice total
-    mov al, [rbx - (cols + 1)]
-    cmp al, 'X'
-    je youLost
+    ; Si está en la primera fila, eliminar la bala
+    test rcx, rcx
+    je borrar_bala_fuera
 
-    mov cl, [rbx]
-    mov [rbx], al
-    mov [rbx - (cols + 1)], cl
-    jmp mainLoop
+    ; Calcular celda arriba
+    mov r10, rcx
+    dec r10
+    imul r11, r10, ROWLEN
+    add r11, rdx
 
-; Moverse abajo si está en rango
-moveDown:
-    call findV
-    mov al, [index]
-    cmp al, rows - 1
-    jae mainLoop
+    mov bl, [rdi + r11]
+    cmp bl, 'X'
+    je bala_destruye_x
+    cmp bl, '0'
+    je bala_sube
 
-    movzx rax, byte [index]
-    imul rdx, rax, cols + 1
-    movzx rax, byte [index + 1]
-    add rdx, rax
+    ; Otro caracter, eliminar bala
+    mov byte [rdi + r9], '0'
+    jmp siguiente_bala
 
-    mov rbx, matrix
-    add rbx, rdx
+borrar_bala_fuera:
+    mov byte [rdi + r9], '0'
+    jmp siguiente_bala
 
-    ; Calcular el índice total del elemento debajo
-    mov al, [rbx + (cols + 1)]
-    cmp al, 'X'
-    je youLost
+bala_destruye_x:
+    mov byte [rdi + r11], '0'
+    mov byte [rdi + r9], '0'
+    mov eax, 1
+    jmp siguiente_bala
 
-    mov cl, [rbx]
-    mov [rbx], al
-    mov [rbx + (cols + 1)], cl
-    jmp mainLoop
+bala_sube:
+    mov byte [rdi + r11], '^'
+    mov byte [rdi + r9], '0'
+    jmp siguiente_bala
 
-youLost:
-    mov rax, 1
-    mov rdi, STDOUT
-    mov rsi, loseMsg
-    mov rdx, loseLen
-    syscall
+siguiente_bala:
+    inc rdx
+    jmp bala_col
 
-    mov rax, 60
-    mov rdi, 1
-    syscall
+sig_bala_fila:
+    inc rcx
+    jmp bala_fila
 
-gameQuit:
-    mov rax, 60
-    xor rdi, rdi
-    syscall
+fin_balas:
+    ret
 
+no_move:
+    mov eax, -1
+    ret
