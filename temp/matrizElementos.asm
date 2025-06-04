@@ -124,6 +124,8 @@ disparar_arriba:
     imul r13, ROWLEN
     add r13, r12
 
+    call mover_balas
+
     mov al, [rdi + r13]
     cmp al, 'X'
     je disparo_exitoso
@@ -144,7 +146,6 @@ disparo_exitoso:
 
     ; mover balas tras disparar
     push rdi
-    call mover_balas
     pop rdi
 
     mov eax, 1
