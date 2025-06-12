@@ -3,8 +3,8 @@
 #include <string.h>
 #include <unistd.h>
 
-#define rows 7
-#define cols 9
+#define rows 12
+#define cols 15
 #define rowlen (cols + 1)  // 9 chars + '\n'
 
 extern int iterar_matriz(char *matrix, char tecla);
@@ -17,7 +17,7 @@ void imprimir_matriz(char *matrix) {
 }
 
 int main() {
-    FILE *f = fopen("saves/nivel.txt", "r");
+    FILE *f = fopen("../saves/nivel.txt", "r");
     if (!f) {
         perror("Error al abrir nivel.txt");
         return 1;
@@ -54,15 +54,32 @@ int main() {
 
         int resultado = iterar_matriz(matrix, tecla);
 
-        if (resultado == 1) {
-            printf("¡Perdiste! Eliminaste una 'X'\n");
-        } else if (resultado == 0) {
+        switch (resultado)
+        {
+        case 0:
             printf("Movimiento válido\n");
-        } else {
+            break;
+        case 1:
+            printf("¡Perdiste una vida! Tocaste una 'X'\n");
+            break;
+        case 2:
+            printf("Enemigo eliminado\n");
+            break;
+        case 3:
+            printf("Ganaste, ya no quedan enemigos\n");
+            break;       
+        case -1:
             printf("Movimiento inválido o sin cambio\n");
+            break;
+        default:
+            break;
         }
-
         imprimir_matriz(matrix);
+
+        if (resultado == 3) {
+            printf("Saliendo...\n");
+            break;
+        }
     }
 
     return 0;
