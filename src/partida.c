@@ -4,10 +4,11 @@
 #include <string.h>
 #include <unistd.h>
 
-#define FILAS 7
-#define COLS 9
+#define FILAS 12
+#define COLS 15
 #define ROWLEN (COLS + 1)
 #define RUTA_ARCHIVO "saves/nivel.txt"
+int vidas = 5;
 
 extern int iterar_matriz(char *matriz, char tecla);
 
@@ -57,6 +58,7 @@ void pintar_matriz(void) {
             switch (c) {
                 case 'V': ruta = "design/elementos/nave1.svg"; break;
                 case 'X': ruta = "design/elementos/nave2.svg"; break;
+                case 'E': ruta = "design/elementos/nave3.svg"; break;
                 case '^': ruta = "design/elementos/bala.svg"; break;
                 case '0': ruta = "design/elementos/vacio.svg"; break;
                 default:
@@ -82,6 +84,15 @@ void pintar_matriz(void) {
     gtk_widget_queue_draw(GTK_WIDGET(grid_dibujo));
 }
 
+void mostrar_marcador() {
+    if (label_marcador) {
+        char texto[32];
+        snprintf(texto, sizeof(texto), "Marcador: %d", marcador);
+        gtk_label_set_text(label_marcador, texto);
+    }
+}
+
+
 gboolean capturar_tecla(GtkEventControllerKey *controller, guint keyval, guint keycode, GdkModifierType state, gpointer user_data) {
     gunichar unicode = gdk_keyval_to_unicode(keyval);
 
@@ -106,12 +117,31 @@ gboolean loop_juego(gpointer user_data) {
         }
 
         if (strchr("wasdpk", tecla)) {
-            int r = iterar_matriz(matriz, tecla);
-            if (r == -1 ) {
-                g_print("Juego finalizado por iterar_matriz == -1\n");
-                gtk_window_close(GTK_WINDOW(gtk_widget_get_root(GTK_WIDGET(grid_dibujo))));
-                return FALSE;
-            }
+            int resultado = iterar_matriz(matriz, tecla);
+            g_print("Resultado ASM: %d\n", resultado);
+
+        switch (resultado)
+        {
+        case 0:
+            break;
+        case 1:
+            vidas-=1;
+            break;
+        case 2:
+            marcador+=3;
+            mostrar_marcador();
+            break;
+        case 3:
+            g_print("Ganaste, ya no quedan enemigos\n");
+            gtk_window_close(GTK_WINDOW(gtk_widget_get_root(GTK_WIDGET(grid_dibujo))));
+            return FALSE;
+            break;       
+        case -1:
+            g_printf("Movimiento inválido o sin cambio\n");
+            break;
+        default:
+            break;
+        }
 
             pintar_matriz();
         }
@@ -122,9 +152,7 @@ gboolean loop_juego(gpointer user_data) {
 
 gboolean actualizar_marcador(gpointer user_data) {
     marcador += 5;
-    char texto[32];
-    snprintf(texto, sizeof(texto), "Marcador: %d", marcador);
-    gtk_label_set_text(label_marcador, texto);
+    mostrar_marcador();
     return TRUE;
 }
 

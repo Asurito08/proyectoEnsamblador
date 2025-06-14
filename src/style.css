@@ -18,3 +18,10 @@
         -1px  1px 0 #e03b00,
          1px  1px 0 #e03b00;
 }
+
+.marcador {
+    font-family: 'C059', serif;
+    font-size: 32px;
+    font-weight: bold;
+    color: white;
+}
