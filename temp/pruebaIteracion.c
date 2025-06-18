@@ -41,7 +41,7 @@ int main() {
 
     char tecla;
     while (1) {
-        printf("Presiona una tecla (w/a/s/d para mover, q para salir): ");
+        printf("Presiona una tecla (w/a/s/d para mover al jugador, t/y/u/i para mover las E, z/x/c/v para mover las V, k para disparar, p para continuar o q para salir): ");
         tecla = getchar();
 
         // Limpiar buffer stdin para evitar problemas con fgets o getchar
@@ -60,18 +60,19 @@ int main() {
             printf("Movimiento válido\n");
             break;
         case 1:
-            printf("¡Perdiste una vida! Tocaste una 'X'\n");
+            printf("¡Perdiste una vida! Tocaste un enemigo\n");
             break;
         case 2:
             printf("Enemigo eliminado\n");
             break;
         case 3:
             printf("Ganaste, ya no quedan enemigos\n");
-            break;       
+            break; 
         case -1:
             printf("Movimiento inválido o sin cambio\n");
             break;
         default:
+            printf("numero retornado: %d", resultado);
             break;
         }
         imprimir_matriz(matrix);
