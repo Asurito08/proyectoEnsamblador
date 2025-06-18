@@ -245,6 +245,12 @@ columna_enemigos_izq:
     dec r10
 
     mov bl, [rdi + r10]
+    cmp bl, '^'
+    jne continuar_x_izq_bala
+    mov r15, 2
+    mov byte [rdi + r9], '0'
+    mov byte [rdi + r10], '0'
+    continuar_x_izq_bala
     cmp bl, 'V'
     jne continuar_x_izq
     mov r15, 1
@@ -266,6 +272,7 @@ siguiente_fila_enemigos_izq:
     jmp fila_enemigos_izq
 
 fin_enemigos_izq:
+    call mover_balas
     jmp verificar_enemigos
 
 mover_x_arriba:
@@ -292,6 +299,12 @@ col_arriba:
     sub r10, ROWLEN
 
     mov bl, [rdi + r10]
+    cmp bl, '^'
+    jne continuar_x_arr_bala
+    mov r15, 2
+    mov byte [rdi + r9], '0'
+    mov byte [rdi + r10], '0'
+    continuar_x_arr_bala
     cmp bl, 'V'
     jne continuar_x_arr
     mov r15, 1
@@ -312,6 +325,7 @@ sig_fila_arriba:
     jmp fila_arriba
 
 fin_mover_x_arriba:
+    call mover_balas
     jmp verificar_enemigos
 
 mover_x_derecha:
@@ -338,6 +352,12 @@ col_der:
     inc r10
 
     mov bl, [rdi + r10]
+    cmp bl, '^'
+    jne continuar_x_der_bala
+    mov r15, 2
+    mov byte [rdi + r9], '0'
+    mov byte [rdi + r10], '0'
+    continuar_x_der_bala
     cmp bl, 'V'
     jne continuar_x_der
     mov r15, 1
@@ -358,6 +378,7 @@ sig_fila_der:
     jmp fila_der
 
 fin_mover_x_derecha:
+    call mover_balas
     jmp verificar_enemigos
 
 mover_x_abajo:
@@ -384,6 +405,12 @@ col_aba:
     add r10, ROWLEN
 
     mov bl, [rdi + r10]
+    cmp bl, '^'
+    jne continuar_x_aba_bala
+    mov r15, 2
+    mov byte [rdi + r9], '0'
+    mov byte [rdi + r10], '0'
+    continuar_x_aba_bala
     cmp bl, 'V'
     jne continuar_x_aba
     mov r15, 1
@@ -404,9 +431,8 @@ sig_fila_aba:
     jmp fila_aba
 
 fin_enemigos_abajo:
-    mov eax, 0
-    call verificar_enemigos
-    ret
+    call mover_balas
+    jmp verificar_enemigos
 
 mover_e_izquierda:
     mov r15, 0
@@ -432,6 +458,12 @@ col_e_izq:
     dec r10
 
     mov bl, [rdi + r10]
+    cmp bl, '^'
+    jne continuar_e_izq_bala
+    mov r15, 2
+    mov byte [rdi + r9], '0'
+    mov byte [rdi + r10], '0'
+    continuar_e_izq_bala
     cmp bl, 'V'
     jne continuar_e_izq
     mov r15, 1
@@ -452,6 +484,7 @@ sig_fila_e_izq:
     jmp fila_e_izq
 
 fin_mover_e_izq:
+    call mover_balas
     jmp verificar_enemigos
 
 mover_e_derecha:
@@ -478,6 +511,12 @@ col_e_der:
     inc r10
 
     mov bl, [rdi + r10]
+    cmp bl, '^'
+    jne continuar_e_der_bala
+    mov r15, 2
+    mov byte [rdi + r9], '0'
+    mov byte [rdi + r10], '0'
+    continuar_e_der_bala
     cmp bl, 'V'
     jne continuar_e_der
     mov r15, 1
@@ -498,6 +537,7 @@ sig_fila_e_der:
     jmp fila_e_der
 
 fin_mover_e_derecha:
+    call mover_balas
     jmp verificar_enemigos
 
 mover_e_arriba:
@@ -524,6 +564,12 @@ col_e_arriba:
     sub r10, ROWLEN
 
     mov bl, [rdi + r10]
+    cmp bl, '^'
+    jne continuar_e_arr_bala
+    mov r15, 2
+    mov byte [rdi + r9], '0'
+    mov byte [rdi + r10], '0'
+    continuar_e_arr_bala
     cmp bl, 'V'
     jne continuar_e_arr
     mov r15, 1
@@ -544,6 +590,7 @@ sig_fila_e_arriba:
     jmp fila_e_arriba
 
 fin_mover_e_arriba:
+    call mover_balas
     jmp verificar_enemigos
 
 mover_e_abajo:
@@ -590,6 +637,7 @@ sig_fila_e_abajo:
     jmp fila_e_abajo
 
 fin_mover_e_abajo:
+    call mover_balas
     jmp verificar_enemigos
 
 verificar_enemigos:
