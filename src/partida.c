@@ -65,7 +65,7 @@ void pintar_matriz(void) {
                 case '^': ruta = "design/elementos/bala.svg"; break;
                 case '0': ruta = "design/elementos/vacio.svg"; break;
                 default:
-                    g_warning("Carácter inválido: '%c' (ASCII %d) en [%d][%d]", c, c, i, j);
+                    printf("Carácter inválido: '%c' (ASCII %d) en [%d][%d]", c, c, i, j);
                     ruta = NULL;
                     break;
             }
@@ -75,10 +75,30 @@ void pintar_matriz(void) {
                 continue;
             }
             printf("Pintando [%d][%d] con ruta: %s\n", i, j, ruta ? ruta : "NULL");
-            gtk_picture_set_filename(GTK_PICTURE(imagenes[i][j]), ruta);
+            if (ruta != NULL) {
+                gtk_picture_set_filename(GTK_PICTURE(imagenes[i][j]), ruta);
+            } else {
+                g_warning("ruta nula en [%d][%d] con char '%c'", i, j, c);
+            }
+
         }
     }
     printf("Pintando matriz en grid_dibujo\n");
+     printf("Verificando punteros de imagenes[][] antes del queue_draw...\n");
+    for (int i = 0; i < FILAS; i++) {
+        for (int j = 0; j < COLS; j++) {
+            GtkWidget *widget = imagenes[i][j];
+            if (!GTK_IS_PICTURE(widget)) {
+                printf("⚠️  Puntero dañado en imagenes[%d][%d]: %p\n", i, j, (void *)widget);
+            }
+        }
+    }
+
+    printf("Verificando puntero de grid_dibujo...\n");
+    if (!GTK_IS_GRID(grid_dibujo)) {
+        printf("❌ grid_dibujo está dañado: %p\n", (void *)grid_dibujo);
+    }
+
     gtk_widget_queue_draw(GTK_WIDGET(grid_dibujo));
     printf("Matriz pintada correctamente\n");
 }
@@ -189,7 +209,6 @@ gboolean loop_juego(gpointer user_data) {
             printf("adios");
         }
     }
-    printf("Loop del juego ejecutado, tecla_buffer");
     return TRUE;
 }
 
