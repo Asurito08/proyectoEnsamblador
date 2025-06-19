@@ -7,8 +7,7 @@ static void irPartida(GtkButton *btn, gpointer user_data) {
     GtkWidget *pantalla = crearPantallaPartida();
     agregarPantalla("partida", pantalla);
     cambiarPantalla(NULL, "partida");
-
-    g_timeout_add(50, (GSourceFunc)gtk_widget_grab_focus, pantalla);
+    g_timeout_add(50, safe_grab_focus, pantalla);
 }
 
 
