@@ -38,7 +38,7 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 # Compilar archivo ASM a objeto
 $(ASM_OBJ): $(ASM_SRC)
 	@mkdir -p $(BUILD_DIR)
-	$(NASM) -f elf64 $< -o $@
+	$(NASM) -f elf64 -g -F dwarf $< -o $@
 
 # Ejecutar la aplicación normalmente
 run: $(TARGET)

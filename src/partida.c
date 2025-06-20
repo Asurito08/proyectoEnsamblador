@@ -74,7 +74,7 @@ void pintar_matriz(void) {
                 g_critical("ERROR: imagenes[%d][%d] no es GtkPicture válido", i, j);
                 continue;
             }
-            printf("Pintando [%d][%d] con ruta: %s\n", i, j, ruta ? ruta : "NULL");
+            // printf("Pintando [%d][%d] con ruta: %s\n", i, j, ruta ? ruta : "NULL");
             if (ruta != NULL) {
                 gtk_picture_set_filename(GTK_PICTURE(imagenes[i][j]), ruta);
             } else {
@@ -178,7 +178,7 @@ gboolean loop_juego(gpointer user_data) {
         }
 
             int resultado;
-        if (strchr("wasdpk", tecla)) {
+        if (strchr("wasdpktyuizxcv", tecla)) {
             
             resultado = iterar_matriz(matriz, tecla);
             g_print("Resultado ASM: %d\n", resultado);
@@ -196,7 +196,7 @@ gboolean loop_juego(gpointer user_data) {
                     break;
                 case 3:
                     g_print("Ganaste, ya no quedan enemigos\n");
-                    //gtk_window_close(GTK_WINDOW(gtk_widget_get_root(GTK_WIDGET(grid_dibujo))));
+                    gtk_window_close(GTK_WINDOW(gtk_widget_get_root(GTK_WIDGET(grid_dibujo))));
                     return FALSE;
                 case -1:
                     g_print("Movimiento inválido o sin cambio\n");

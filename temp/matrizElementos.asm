@@ -1,6 +1,3 @@
-section .bss
-    valorRetorno resb 1
-
 section .text
 global iterar_matriz
 
@@ -76,6 +73,7 @@ v_encontrada:
     cmp al, 'i'
     je mover_e_abajo
     
+
     jmp no_move
 
 mover_izquierda:
@@ -109,24 +107,18 @@ calcular_nueva_pos:
     mov byte [rdi + r13], 'V'
     mov byte [rdi + r10], '0'
 
-    mov byte [valorRetorno], 0
-    call verificar_enemigos
-    mov byte eax, [valorRetorno]
-    ret
+    mov r15, 0
+    jmp verificar_enemigos
 
 eliminar_enemigo:
     mov byte [rdi + r13], 'V'
     mov byte [rdi + r10], '0'
 
-    mov byte [valorRetorno], 1
-    call verificar_enemigos
-    mov byte eax, [valorRetorno]
-    ret
+    mov r15, 1
+    jmp verificar_enemigos
 
 disparar:
 
-    test r11, r11
-    js no_move
     add r11, -1
     mov r13, r11
     imul r13, ROWLEN
@@ -138,39 +130,35 @@ disparar:
     cmp al, 'X'
     je disparo_exitoso
 
-    cmp al, 'E'
+    cmp al, 'E' push r10
+    call mover_balas
+    pop r10
     je disparo_exitoso
 
     cmp al, '0'
     je colocar_bala
 
-    mov byte [valorRetorno], -1
+    mov eax, -1
     ret
 
 colocar_bala:
     mov byte [rdi + r13], '^'
-    cmp byte [valorRetorno], 2
+    cmp r15, 2
     je continuar_colocar_bala
-    mov byte [valorRetorno], 0
+    mov r15, 0
     continuar_colocar_bala:
-    call verificar_enemigos
-    mov byte rax, [valorRetorno]
-    ret
+    jmp verificar_enemigos
 
 disparo_exitoso:
     mov byte [rdi + r13], '0'
 
-    mov byte [valorRetorno], 2
-    call verificar_enemigos
-    mov byte rax, [valorRetorno]
-    ret
+    mov r15, 2
+    jmp verificar_enemigos
 
 mover_balas_arriba:
-    mov byte [valorRetorno], 0
+    mov r15, 0
     call mover_balas
-    call verificar_enemigos
-    mov byte rax, [valorRetorno]
-    ret
+    jmp verificar_enemigos
 
 mover_balas:
     mov rcx, 0
@@ -216,7 +204,7 @@ borrar_bala_fuera:
 bala_destruye:
     mov byte [rdi + r11], '0'
     mov byte [rdi + r9], '0'
-    mov byte [valorRetorno], 2
+    mov r15, 2
     jmp siguiente_bala
 
 bala_sube:
@@ -236,7 +224,7 @@ fin_balas:
     ret
 
 mover_x_izquierda:
-    mov byte [valorRetorno], 0
+    mov r15, 0
     mov rcx, 0
 fila_enemigos_izq:
     cmp rcx, ROWS
@@ -261,18 +249,19 @@ columna_enemigos_izq:
     mov bl, [rdi + r10]
     cmp bl, '^'
     jne continuar_x_izq_bala
-    mov byte [valorRetorno], 2
-    mov byte [rdi + r9], '0'
+    mov r15, 2
     mov byte [rdi + r10], '0'
+    mov byte [rdi + r9], '0'
     continuar_x_izq_bala:
     cmp bl, 'V'
     jne continuar_x_izq
-    mov byte [valorRetorno], 1
+    mov r15, 1
     mov byte [rdi + r9], '0'
     continuar_x_izq:
     cmp bl, '0'
     jne siguiente_col_enemigos_izq
 
+    ; mover enemigo a la izquierda
     mov byte [rdi + r10], 'X'
     mov byte [rdi + r9], '0'
 
@@ -286,12 +275,10 @@ siguiente_fila_enemigos_izq:
 
 fin_enemigos_izq:
     call mover_balas
-    call verificar_enemigos
-    mov byte rax, [valorRetorno]
-    ret
+    jmp verificar_enemigos
 
 mover_x_arriba:
-    mov byte [valorRetorno], 0
+    mov r15, 0
     mov rcx, 1
 fila_arriba:
     cmp rcx, ROWS
@@ -316,13 +303,13 @@ col_arriba:
     mov bl, [rdi + r10]
     cmp bl, '^'
     jne continuar_x_arr_bala
-    mov byte [valorRetorno], 2
-    mov byte [rdi + r9], '0'
+    mov r15, 2
     mov byte [rdi + r10], '0'
+    mov byte [rdi + r9], '0'
     continuar_x_arr_bala:
     cmp bl, 'V'
     jne continuar_x_arr
-    mov byte [valorRetorno], 1
+    mov r15, 1
     mov byte [rdi + r9], '0'
     continuar_x_arr:
     cmp bl, '0'
@@ -341,12 +328,10 @@ sig_fila_arriba:
 
 fin_mover_x_arriba:
     call mover_balas
-    call verificar_enemigos
-    mov byte eax, [valorRetorno]
-    ret
+    jmp verificar_enemigos
 
 mover_x_derecha:
-    mov byte [valorRetorno], 0
+    mov r15, 0
     mov rcx, 0
 fila_der:
     cmp rcx, ROWS
@@ -371,13 +356,13 @@ col_der:
     mov bl, [rdi + r10]
     cmp bl, '^'
     jne continuar_x_der_bala
-    mov byte [valorRetorno], 2
-    mov byte [rdi + r9], '0'
+    mov r15, 2
     mov byte [rdi + r10], '0'
+    mov byte [rdi + r9], '0'
     continuar_x_der_bala:
     cmp bl, 'V'
     jne continuar_x_der
-    mov byte [valorRetorno], 1
+    mov r15, 1
     mov byte [rdi + r9], '0'
     continuar_x_der:
     cmp bl, '0'
@@ -396,12 +381,10 @@ sig_fila_der:
 
 fin_mover_x_derecha:
     call mover_balas
-    call verificar_enemigos
-    mov byte rax, [valorRetorno]
-    ret
+    jmp verificar_enemigos
 
 mover_x_abajo:
-    mov byte [valorRetorno], 0
+    mov r15, 0
     mov rcx, ROWS-2
 fila_aba:
     cmp rcx, -1
@@ -426,13 +409,13 @@ col_aba:
     mov bl, [rdi + r10]
     cmp bl, '^'
     jne continuar_x_aba_bala
-    mov byte [valorRetorno], 2
-    mov byte [rdi + r9], '0'
+    mov r15, 2
     mov byte [rdi + r10], '0'
+    mov byte [rdi + r9], '0'
     continuar_x_aba_bala:
     cmp bl, 'V'
     jne continuar_x_aba
-    mov byte [valorRetorno], 1
+    mov r15, 1
     mov byte [rdi + r9], '0'
     continuar_x_aba:
     cmp bl, '0'
@@ -451,12 +434,10 @@ sig_fila_aba:
 
 fin_enemigos_abajo:
     call mover_balas
-    call verificar_enemigos
-    mov byte rax, [valorRetorno]
-    ret
+    jmp verificar_enemigos
 
 mover_e_izquierda:
-    mov byte [valorRetorno], 0
+    mov r15, 0
     mov rcx, 0
 fila_e_izq:
     cmp rcx, ROWS
@@ -481,13 +462,13 @@ col_e_izq:
     mov bl, [rdi + r10]
     cmp bl, '^'
     jne continuar_e_izq_bala
-    mov byte [valorRetorno], 2
-    mov byte [rdi + r9], '0'
+    mov r15, 2
     mov byte [rdi + r10], '0'
+    mov byte [rdi + r9], '0'
     continuar_e_izq_bala:
     cmp bl, 'V'
     jne continuar_e_izq
-    mov byte [valorRetorno], 1
+    mov r15, 1
     mov byte [rdi + r9], '0'
     continuar_e_izq:
     cmp bl, '0'
@@ -506,12 +487,10 @@ sig_fila_e_izq:
 
 fin_mover_e_izq:
     call mover_balas
-    call verificar_enemigos
-    mov byte rax, [valorRetorno]
-    ret
+    jmp verificar_enemigos
 
 mover_e_derecha:
-    mov byte [valorRetorno], 0
+    mov r15, 0
     mov rcx, 0
 fila_e_der:
     cmp rcx, ROWS
@@ -536,13 +515,13 @@ col_e_der:
     mov bl, [rdi + r10]
     cmp bl, '^'
     jne continuar_e_der_bala
-    mov byte [valorRetorno], 2
-    mov byte [rdi + r9], '0'
+    mov r15, 2
     mov byte [rdi + r10], '0'
+    mov byte [rdi + r9], '0'
     continuar_e_der_bala:
     cmp bl, 'V'
     jne continuar_e_der
-    mov byte [valorRetorno], 1
+    mov r15, 1
     mov byte [rdi + r9], '0'
     continuar_e_der:
     cmp bl, '0'
@@ -561,12 +540,10 @@ sig_fila_e_der:
 
 fin_mover_e_derecha:
     call mover_balas
-    call verificar_enemigos
-    mov byte rax, [valorRetorno]
-    ret
+    jmp verificar_enemigos
 
 mover_e_arriba:
-    mov byte [valorRetorno], 0
+    mov r15, 0
     mov rcx, 1
 fila_e_arriba:
     cmp rcx, ROWS
@@ -591,13 +568,13 @@ col_e_arriba:
     mov bl, [rdi + r10]
     cmp bl, '^'
     jne continuar_e_arr_bala
-    mov byte [valorRetorno], 2
-    mov byte [rdi + r9], '0'
+    mov r15, 2
     mov byte [rdi + r10], '0'
+    mov byte [rdi + r9], '0'
     continuar_e_arr_bala:
     cmp bl, 'V'
     jne continuar_e_arr
-    mov byte [valorRetorno], 1
+    mov r15, 1
     mov byte [rdi + r9], '0'
     continuar_e_arr:
     cmp bl, '0'
@@ -616,12 +593,10 @@ sig_fila_e_arriba:
 
 fin_mover_e_arriba:
     call mover_balas
-    call verificar_enemigos
-    mov byte rax, [valorRetorno]
-    ret
+    jmp verificar_enemigos
 
 mover_e_abajo:
-    mov byte [valorRetorno], 0
+    mov r15, 0
     mov rcx, ROWS - 2
 fila_e_abajo:
     cmp rcx, -1
@@ -644,15 +619,9 @@ col_e_abajo:
     add r10, ROWLEN
 
     mov bl, [rdi + r10]
-    cmp bl, '^'
-    jne continuar_e_aba_bala
-    mov byte [valorRetorno], 2
-    mov byte [rdi + r9], '0'
-    mov byte [rdi + r10], '0'
-    continuar_e_aba_bala:
     cmp bl, 'V'
     jne continuar_e_aba
-    mov byte [valorRetorno], 1
+    mov r15, 1
     mov byte [rdi + r9], '0'
     continuar_e_aba:
     cmp bl, '0'
@@ -671,9 +640,7 @@ sig_fila_e_abajo:
 
 fin_mover_e_abajo:
     call mover_balas
-    call verificar_enemigos
-    mov byte rax, [valorRetorno]
-    ret
+    jmp verificar_enemigos
 
 verificar_enemigos:
     xor rcx, rcx
@@ -704,10 +671,11 @@ sig_fila_ver:
     jmp ver_fila
 
 enemigos_presentes:
+    mov eax, r15d
     ret
 
 enemigos_fuera:
-    mov byte [valorRetorno], 3
+    mov eax, 3
     ret
 
 no_move:
