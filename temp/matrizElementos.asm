@@ -248,8 +248,8 @@ columna_enemigos_izq:
     cmp bl, '^'
     jne continuar_x_izq_bala
     mov r15, 2
-    mov byte [rdi + r9], '0'
     mov byte [rdi + r10], '0'
+    mov byte [rdi + r9], '0'
     continuar_x_izq_bala:
     cmp bl, 'V'
     jne continuar_x_izq
@@ -302,8 +302,8 @@ col_arriba:
     cmp bl, '^'
     jne continuar_x_arr_bala
     mov r15, 2
-    mov byte [rdi + r9], '0'
     mov byte [rdi + r10], '0'
+    mov byte [rdi + r9], '0'
     continuar_x_arr_bala:
     cmp bl, 'V'
     jne continuar_x_arr
@@ -355,8 +355,8 @@ col_der:
     cmp bl, '^'
     jne continuar_x_der_bala
     mov r15, 2
-    mov byte [rdi + r9], '0'
     mov byte [rdi + r10], '0'
+    mov byte [rdi + r9], '0'
     continuar_x_der_bala:
     cmp bl, 'V'
     jne continuar_x_der
@@ -408,8 +408,8 @@ col_aba:
     cmp bl, '^'
     jne continuar_x_aba_bala
     mov r15, 2
-    mov byte [rdi + r9], '0'
     mov byte [rdi + r10], '0'
+    mov byte [rdi + r9], '0'
     continuar_x_aba_bala:
     cmp bl, 'V'
     jne continuar_x_aba
@@ -461,8 +461,8 @@ col_e_izq:
     cmp bl, '^'
     jne continuar_e_izq_bala
     mov r15, 2
-    mov byte [rdi + r9], '0'
     mov byte [rdi + r10], '0'
+    mov byte [rdi + r9], '0'
     continuar_e_izq_bala:
     cmp bl, 'V'
     jne continuar_e_izq
@@ -514,8 +514,8 @@ col_e_der:
     cmp bl, '^'
     jne continuar_e_der_bala
     mov r15, 2
-    mov byte [rdi + r9], '0'
     mov byte [rdi + r10], '0'
+    mov byte [rdi + r9], '0'
     continuar_e_der_bala:
     cmp bl, 'V'
     jne continuar_e_der
@@ -567,8 +567,8 @@ col_e_arriba:
     cmp bl, '^'
     jne continuar_e_arr_bala
     mov r15, 2
-    mov byte [rdi + r9], '0'
     mov byte [rdi + r10], '0'
+    mov byte [rdi + r9], '0'
     continuar_e_arr_bala:
     cmp bl, 'V'
     jne continuar_e_arr
@@ -638,7 +638,8 @@ sig_fila_e_abajo:
 
 fin_mover_e_abajo:
     call mover_balas
-    jmp verificar_enemigos
+    call verificar_enemigos
+    mov rax, r15
 
 verificar_enemigos:
     xor rcx, rcx

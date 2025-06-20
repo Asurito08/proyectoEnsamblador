@@ -7,7 +7,7 @@ pruebaIteracion.o: pruebaIteracion.c
 	gcc -c pruebaIteracion.c -o pruebaIteracion.o
 
 matrizElementos.o: matrizElementos.asm
-	nasm -f elf64 matrizElementos.asm -o matrizElementos.o
+	nasm -f elf64 -g -F dwarf matrizElementos.asm -o matrizElementos.o
 
 run: ejecutable
 	./ejecutable
