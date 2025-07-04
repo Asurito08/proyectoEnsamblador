@@ -6,6 +6,7 @@
 #include "pausa.h"
 #include "victoria.h"
 #include "derrota.h"
+#include "puntuaciones.h"
 
 GtkWidget* crearPantallaPartida(void);
 gboolean loop_juego(gpointer data);

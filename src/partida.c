@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <time.h>
 
 #define FILAS_JUEGO 11
 #define FILA_HUD 11
@@ -11,15 +12,18 @@
 #define COLS 15
 #define ROWLEN (COLS + 1)
 #define RUTA_ARCHIVO "saves/nivel.txt"
-#define RUTA_ARCHIVO2 "saves/nive2.txt"
-#define RUTA_ARCHIVO3 "saves/nive3.txt"
 
 extern char *naveElegida;
 extern char nombreJugador[100];
 
-int vidas = 5;
+int vidas = 3;
 int marcador_timer_id = 0;
 int partida_timer_id = 0;
+int spawn_timer_id = 0;
+int auto_tecla_timer_id = 0;
+int intervalo_auto_tecla = 2;   // comienza en 2 segundos
+int intervalo_spawn = 3;        // comienza en 3 segundos
+int bala_timer_id = 0;
 GtkGrid *grid_dibujo = NULL;
 GtkWidget *imagenes[FILAS][COLS];
 char matriz[FILAS * ROWLEN];
@@ -49,6 +53,30 @@ void cargar_matriz(const char *filename, char *matriz) {
     fclose(archivo);
 }
 
+void insertar_enemigos() {
+    static int alternar = 0; 
+    char enemigo = alternar == 0 ? 'X' : 'E';
+
+    int fila = 0; 
+    int enemigos_insertados = 0;
+    int intentos = 0;
+
+    while (enemigos_insertados < 2 && intentos < 20) {
+        int columna = rand() % COLS;
+        char *pos = &matriz[fila * ROWLEN + columna];
+
+        if (*pos == '0' || *pos == ' ') {
+            *pos = enemigo;
+            enemigos_insertados++;
+        }
+        intentos++;
+    }
+
+    alternar = 1 - alternar;
+}
+
+
+
 void pintar_matriz(void) {
     if (!GTK_IS_GRID(grid_dibujo)) {
         g_warning("grid_dibujo no está inicializado");
@@ -59,7 +87,7 @@ void pintar_matriz(void) {
         for (int j = 0; j < COLS; j++) {
             char c = matriz[i * ROWLEN + j];
             const char *ruta = NULL;
-             if (i == FILAS - 1) {
+             if (i == FILAS - 1||i == FILAS -2) {
             ruta = "design/elementos/vacio.svg";
         } else {
             switch (c) {
@@ -164,6 +192,29 @@ void mostrar_victoria(GtkWindow *parent) {
     cambiarPantalla(NULL, "victoria");
 }
 
+gboolean spawn_loop(gpointer user_data) {
+    insertar_enemigos();
+    return TRUE;
+}
+
+gboolean enviar_tecla_bala(gpointer user_data) {
+    tecla_buffer = 'p';
+    return TRUE;
+}
+
+gboolean enviar_letra_alternada(gpointer user_data) {
+    static int alternador = 0; 
+
+    if (alternador == 0) {
+        tecla_buffer = 'c';
+    } else {
+        tecla_buffer = 'i';
+    }
+
+    alternador = 1 - alternador; 
+
+    return TRUE;
+}
 
 gboolean capturar_tecla(GtkEventControllerKey *controller, guint keyval, guint keycode, GdkModifierType state, gpointer user_data) {
     gunichar unicode = gdk_keyval_to_unicode(keyval);
@@ -199,6 +250,35 @@ gboolean loop_juego(gpointer user_data) {
         if (strchr("wasdpktyuizxcv", tecla)) {
             
             resultado = iterar_matriz(matriz, tecla);
+            if (marcador >= 110){
+                resultado = 3; 
+            }
+
+            if (marcador > 30 && intervalo_auto_tecla != 1) {
+                if (auto_tecla_timer_id != 0)
+                    g_source_remove(auto_tecla_timer_id);
+
+                auto_tecla_timer_id = g_timeout_add_seconds(1, enviar_letra_alternada, NULL);
+                intervalo_auto_tecla = 1; // actualizar el valor actual
+            }
+
+            int nuevo_intervalo = intervalo_spawn;
+
+            if (marcador > 80) {
+                nuevo_intervalo = 1;
+            } else if (marcador > 50) {
+                nuevo_intervalo = 2;
+            } else {
+                nuevo_intervalo = 3;
+            }
+
+            if (nuevo_intervalo != intervalo_spawn) {
+                if (spawn_timer_id != 0)
+                    g_source_remove(spawn_timer_id);
+            
+                spawn_timer_id = g_timeout_add_seconds(nuevo_intervalo, spawn_loop, NULL);
+                intervalo_spawn = nuevo_intervalo;
+            }
 
             switch (resultado) {
                 case 0://valido
@@ -216,8 +296,21 @@ gboolean loop_juego(gpointer user_data) {
                             g_source_remove(marcador_timer_id);
                             marcador_timer_id = 0;
                         }
+                        if (spawn_timer_id != 0) {
+                            g_source_remove(spawn_timer_id);
+                            spawn_timer_id = 0;
+                        }
+                        if (auto_tecla_timer_id != 0) {
+                            g_source_remove(auto_tecla_timer_id);
+                            auto_tecla_timer_id = 0;
+                        }
+                        if (bala_timer_id != 0) {
+                            g_source_remove(bala_timer_id);
+                            bala_timer_id = 0;
+                        }
+
                         marcador = 0;
-                        vidas = 5;
+                        vidas = 3;
                         return FALSE;
                     }
                     actualizar_widget_vidas(vidas);
@@ -236,6 +329,10 @@ gboolean loop_juego(gpointer user_data) {
                         fclose(archivo);
                     }
 
+                    if (widgetsGlobal != NULL) {
+                        cargarPuntuaciones(widgetsGlobal->nombresBox, widgetsGlobal->puntosBox,widgetsGlobal->overlay, widgetsGlobal->botonReset);
+                    }
+
                     if (partida_timer_id != 0) {
                         g_source_remove(partida_timer_id);
                         partida_timer_id = 0;
@@ -244,7 +341,20 @@ gboolean loop_juego(gpointer user_data) {
                         g_source_remove(marcador_timer_id);
                         marcador_timer_id = 0;
                     }
+                    if (spawn_timer_id != 0) {
+                        g_source_remove(spawn_timer_id);
+                        spawn_timer_id = 0;
+                    }
+                    if (auto_tecla_timer_id != 0) {
+                        g_source_remove(auto_tecla_timer_id);
+                        auto_tecla_timer_id = 0;
+                    }
+                    if (bala_timer_id != 0) {
+                       g_source_remove(bala_timer_id);
+                       bala_timer_id = 0;
+                    }
                     marcador = 0;
+                    vidas = 3;
                     return FALSE;
                 case -1://invalido
                     break;
@@ -259,7 +369,7 @@ gboolean loop_juego(gpointer user_data) {
 }
 
 gboolean actualizar_marcador(gpointer user_data) {
-    marcador += 5;
+    marcador -= 5;
     mostrar_marcador();
     return TRUE;
 }
@@ -334,8 +444,18 @@ GtkWidget* crearPantallaPartida(void) {
         g_source_remove(marcador_timer_id);
         marcador_timer_id = 0;
     }
+    if (spawn_timer_id != 0) {
+        g_source_remove(spawn_timer_id);
+    }
+    if (auto_tecla_timer_id != 0) {
+        g_source_remove(auto_tecla_timer_id);
+    }
+
+    auto_tecla_timer_id = g_timeout_add_seconds(2, enviar_letra_alternada, NULL);
+    spawn_timer_id = g_timeout_add_seconds(3, spawn_loop, NULL);
     partida_timer_id = g_timeout_add(50, loop_juego, NULL);
-    marcador_timer_id = g_timeout_add_seconds(3, actualizar_marcador, NULL);
+    marcador_timer_id = g_timeout_add_seconds(20, actualizar_marcador, NULL);
+    bala_timer_id = g_timeout_add(200, enviar_tecla_bala, NULL); // cada 50 ms
 
     pintar_matriz();
 

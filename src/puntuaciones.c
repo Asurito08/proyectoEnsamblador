@@ -2,36 +2,66 @@
 #include "stackManager.h"
 #include <stdio.h>
 
-typedef struct {
-    GtkWidget *nombresBox;
-    GtkWidget *puntosBox;
-    GtkWidget *overlay;
-    GtkWidget *botonReset;
-} WidgetsPuntuaciones;
+WidgetsPuntuaciones *widgetsGlobal = NULL;
 
 static void mostrarMensajeSinPuntajes(GtkWidget *overlay, GtkWidget *botonReset) {
     GtkWidget *mensaje = gtk_label_new("No hay puntuaciones registradas");
+    gtk_widget_set_name(mensaje, "mensaje_sin_puntajes");
     gtk_widget_add_css_class(mensaje, "formato");
     gtk_widget_set_halign(mensaje, GTK_ALIGN_CENTER);
     gtk_widget_set_valign(mensaje, GTK_ALIGN_CENTER);
     gtk_overlay_add_overlay(GTK_OVERLAY(overlay), mensaje);
     gtk_widget_set_visible(botonReset, FALSE);
+    
 }
 
-static void cargarPuntuaciones(GtkWidget *nombresBox, GtkWidget *puntosBox, GtkWidget *overlay, GtkWidget *botonReset) {
+int comparar_puntuaciones(const void *a, const void *b) {
+    return ((Puntuacion *)b)->puntaje - ((Puntuacion *)a)->puntaje;
+}
+
+void cargarPuntuaciones(GtkWidget *nombresBox, GtkWidget *puntosBox, GtkWidget *overlay, GtkWidget *botonReset) {
+    GtkWidget *child;
+
+    // 1. Eliminar mensaje de "No hay puntuaciones" si existe
+    child = gtk_widget_get_first_child(overlay);
+    while (child) {
+        GtkWidget *next = gtk_widget_get_next_sibling(child);
+        const char *nombre = gtk_widget_get_name(child);
+        if (nombre && g_strcmp0(nombre, "mensaje_sin_puntajes") == 0) {
+            gtk_widget_unparent(child);
+            break;
+        }
+        child = next;
+    }
+
+    // 2. Limpiar las cajas
+    while ((child = gtk_widget_get_first_child(nombresBox)) != NULL)
+        gtk_widget_unparent(child);
+    while ((child = gtk_widget_get_first_child(puntosBox)) != NULL)
+        gtk_widget_unparent(child);
+
+    // 3. Leer puntuaciones del archivo
     FILE *archivo = fopen("saves/puntuaciones.txt", "r");
     if (!archivo) return;
 
-    char nombre[100];
-    int puntaje;
-    int posicion = 1;
+    Puntuacion lista[100];
+    int cantidad = 0;
     int hayPuntajes = 0;
 
-    while (fscanf(archivo, "%s %d", nombre, &puntaje) == 2) {
+    while (fscanf(archivo, "%s %d", lista[cantidad].nombre, &lista[cantidad].puntaje) == 2) {
+        cantidad++;
+    }
+    fclose(archivo);
+
+    // 4. Ordenar de mayor a menor
+    qsort(lista, cantidad, sizeof(Puntuacion), comparar_puntuaciones);
+
+    // 5. Mostrar en pantalla
+    for (int i = 0; i < cantidad; i++) {
         hayPuntajes = 1;
 
         char nombreFormateado[150];
-        snprintf(nombreFormateado, sizeof(nombreFormateado), "%2d. %s", posicion, nombre);
+        snprintf(nombreFormateado, sizeof(nombreFormateado), "%2d. %s", i + 1, lista[i].nombre);
 
         GtkWidget *labelNombre = gtk_label_new(nombreFormateado);
         gtk_widget_add_css_class(labelNombre, "formato");
@@ -39,17 +69,14 @@ static void cargarPuntuaciones(GtkWidget *nombresBox, GtkWidget *puntosBox, GtkW
         gtk_box_append(GTK_BOX(nombresBox), labelNombre);
 
         char textoPuntaje[20];
-        sprintf(textoPuntaje, "%d", puntaje);
+        sprintf(textoPuntaje, "%d", lista[i].puntaje);
         GtkWidget *labelPuntaje = gtk_label_new(textoPuntaje);
         gtk_widget_add_css_class(labelPuntaje, "formato");
         gtk_widget_set_halign(labelPuntaje, GTK_ALIGN_CENTER);
         gtk_box_append(GTK_BOX(puntosBox), labelPuntaje);
-
-        posicion++;
     }
 
-    fclose(archivo);
-
+    // 6. Si no hay puntajes, mostrar mensaje alternativo
     if (!hayPuntajes) {
         mostrarMensajeSinPuntajes(overlay, botonReset);
     }
@@ -126,6 +153,7 @@ GtkWidget* crearPantallaPuntuaciones(void) {
     widgets->puntosBox = puntosBox;
     widgets->overlay = overlay;
     widgets->botonReset = botonReset;
+    widgetsGlobal = widgets;
     g_signal_connect(botonReset, "clicked", G_CALLBACK(limpiarPuntuaciones), widgets);
     gtk_overlay_add_overlay(GTK_OVERLAY(overlay), botonReset);
     g_object_unref(pixbufReset);
