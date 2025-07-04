@@ -111,7 +111,7 @@ calcular_nueva_pos:
 
     mov byte [valorRetorno], 0
     call verificar_enemigos
-    mov byte eax, [valorRetorno]
+    mov byte rax, [valorRetorno]
     ret
 
 eliminar_enemigo:
@@ -120,7 +120,7 @@ eliminar_enemigo:
 
     mov byte [valorRetorno], 1
     call verificar_enemigos
-    mov byte eax, [valorRetorno]
+    mov byte rax, [valorRetorno]
     ret
 
 disparar:
@@ -342,7 +342,7 @@ sig_fila_arriba:
 fin_mover_x_arriba:
     call mover_balas
     call verificar_enemigos
-    mov byte eax, [valorRetorno]
+    mov byte rax, [valorRetorno]
     ret
 
 mover_x_derecha:
@@ -711,5 +711,5 @@ enemigos_fuera:
     ret
 
 no_move:
-    mov eax, -1
+    mov rax, -1
     ret

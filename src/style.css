@@ -96,3 +96,7 @@ button.flat:hover {
     background-color: transparent;
     box-shadow: none;
 }
+
+.texto_marcador_pequeno {
+    font-size: 34px;
+}

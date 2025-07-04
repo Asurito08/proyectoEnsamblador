@@ -5,10 +5,15 @@
 #include <string.h>
 #include <unistd.h>
 
+#define FILAS_JUEGO 11
+#define FILA_HUD 11
 #define FILAS 12
 #define COLS 15
 #define ROWLEN (COLS + 1)
 #define RUTA_ARCHIVO "saves/nivel.txt"
+#define RUTA_ARCHIVO2 "saves/nive2.txt"
+#define RUTA_ARCHIVO3 "saves/nive3.txt"
+
 
 int vidas = 5;
 int marcador_timer_id = 0;
@@ -20,7 +25,8 @@ gint tecla_buffer = 0;
 int marcador = 0;
 GtkLabel *label_marcador = NULL;
 GtkWidget *widget_vidas = NULL;
-
+static const char letras_unicas[] = { 'z', 'v', 't', 'y' };
+static int indice_unico = 0;
 extern int iterar_matriz(char *matriz, char tecla);
 
 void cargar_matriz(const char *filename, char *matriz) {
@@ -57,7 +63,9 @@ void pintar_matriz(void) {
         for (int j = 0; j < COLS; j++) {
             char c = matriz[i * ROWLEN + j];
             const char *ruta = NULL;
-
+             if (i == FILAS - 1) {
+            ruta = "design/elementos/vacio.svg";
+        } else {
             switch (c) {
                 case 'V': ruta = "design/elementos/nave1.svg"; break;
                 case 'X': ruta = "design/elementos/nave2.svg"; break;
@@ -69,7 +77,7 @@ void pintar_matriz(void) {
                     ruta = NULL;
                     break;
             }
-
+        }
             if (imagenes[i][j] == NULL || !GTK_IS_PICTURE(imagenes[i][j])) {
                 g_critical("ERROR: imagenes[%d][%d] no es GtkPicture válido", i, j);
                 continue;
@@ -112,11 +120,12 @@ void mostrar_marcador() {
 }
 
 GtkWidget* crear_widget_vidas(int vidas) {
-    GtkWidget *caja_vidas = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
+    GtkWidget *caja_vidas = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 
     for (int i = 0; i < vidas; i++) {
         GtkWidget *corazon = gtk_picture_new_for_filename("design/elementos/corazon.png");
-        gtk_widget_set_size_request(corazon, 32, 32);
+        gtk_picture_set_content_fit(GTK_PICTURE(corazon), GTK_CONTENT_FIT_CONTAIN);
+        gtk_widget_set_size_request(corazon, 2, 2);
         gtk_box_append(GTK_BOX(caja_vidas), corazon);
     }
 
@@ -243,6 +252,8 @@ GtkWidget* crearPantallaPartida(void) {
     // Crear marcador
     label_marcador = GTK_LABEL(gtk_label_new("Marcador: 0"));
     gtk_widget_add_css_class(GTK_WIDGET(label_marcador), "texto_sin_borde");
+    gtk_widget_add_css_class(GTK_WIDGET(label_marcador), "texto_marcador_pequeno");
+
 
     // Crear widget de vidas
     widget_vidas = crear_widget_vidas(vidas);
@@ -251,9 +262,9 @@ GtkWidget* crearPantallaPartida(void) {
     GtkWidget *hud_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 20);
     gtk_widget_set_halign(hud_box, GTK_ALIGN_FILL);
     gtk_widget_set_valign(hud_box, GTK_ALIGN_END);
-    gtk_widget_set_margin_bottom(hud_box, 10);
-    gtk_widget_set_margin_start(hud_box, 10);
-    gtk_widget_set_margin_end(hud_box, 10);
+    gtk_widget_set_margin_bottom(hud_box, 0);
+    gtk_widget_set_margin_start(hud_box, 0);
+    gtk_widget_set_margin_end(hud_box, 0);
     gtk_widget_set_hexpand(hud_box, TRUE);
 
     gtk_box_append(GTK_BOX(hud_box), GTK_WIDGET(label_marcador));
