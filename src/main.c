@@ -1,6 +1,7 @@
 #include <gtk/gtk.h>
 #include <gst/gst.h>
 #include <glib.h>
+#include "pantallaNombre.h"
 #include "stackManager.h"
 #include "menu.h"
 #include "opciones.h"
@@ -70,6 +71,7 @@ static void activate(GtkApplication *aplicacion, gpointer datosUsuario) {
     agregarPantalla("menu", crearMenu());
     agregarPantalla("opciones", crearPantallaOpciones());
     agregarPantalla("puntuaciones", crearPantallaPuntuaciones());
+    agregarPantalla("pantallaNombre", crearPantallaNombreJugador());
 
     if (pipeline) {
         g_object_set(pipeline, "volume", 0.3, NULL);

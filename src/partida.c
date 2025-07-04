@@ -15,6 +15,7 @@
 #define RUTA_ARCHIVO3 "saves/nive3.txt"
 
 extern char *naveElegida;
+extern char nombreJugador[100];
 
 int vidas = 5;
 int marcador_timer_id = 0;
@@ -199,6 +200,10 @@ gboolean loop_juego(gpointer user_data) {
                     break;
                 case 3:
                     gtk_window_close(GTK_WINDOW(gtk_widget_get_root(GTK_WIDGET(grid_dibujo))));
+                    FILE *archivo = fopen("saves/puntuaciones.txt", "a");
+                    if (!archivo) return;
+                    fprintf(archivo, "%s %d\n", nombreJugador, marcador);
+                    fclose(archivo);
                     return FALSE;
                 case -1:
                     break;
