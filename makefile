@@ -18,9 +18,9 @@ ASM_OBJ = $(BUILD_DIR)/matrizElementos.o
 # Nombre del ejecutable
 TARGET = $(BIN_DIR)/mi_app
 
-# Flags de compilación y enlace
-CFLAGS = -g -O0 $(shell pkg-config --cflags gtk4)
-LDFLAGS = $(shell pkg-config --libs gtk4)
+# Flags de compilación y enlace (incluye GStreamer)
+CFLAGS = -g -O0 $(shell pkg-config --cflags gtk4 gstreamer-1.0)
+LDFLAGS = $(shell pkg-config --libs gtk4 gstreamer-1.0)
 
 # Regla por defecto
 all: $(TARGET)

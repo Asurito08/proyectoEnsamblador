@@ -1,10 +1,19 @@
 #include "opciones.h"
 #include "stackManager.h"
+#include "audio.h"
 
-//Funcion momentanea para mostar que los botones de las naves si funcioan
+char *naveElegida= "design/elementos/nave1.svg";
+
+void on_slider_volumen_cambiado(GtkRange *range, gpointer user_data) {
+    gdouble valor = gtk_range_get_value(range);
+    if (pipeline != NULL) {
+        g_object_set(pipeline, "volume", valor, NULL);
+    }
+}
+
 static void seleccionarNave(GtkButton *boton, gpointer datosUsuario) {
     const char *nombreNave = (const char *)datosUsuario;
-    g_print("%s ha sido escogida\n", nombreNave);
+    naveElegida = nombreNave;
 }
 
 //Funcion para crear la pantalla de opciones y agregarle su contenido
@@ -38,10 +47,12 @@ GtkWidget* crearPantallaOpciones(void) {
     gtk_widget_set_valign(controlSonido, GTK_ALIGN_CENTER);
 
     //Se pone el slider para regular el sonido
-    GtkWidget *sliderVolumen = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL, 0, 100, 1);
+    GtkWidget *sliderVolumen = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL, 0.0, 1.0, 0.01);
     gtk_widget_set_size_request(sliderVolumen, 300, -1);
-    gtk_range_set_value(GTK_RANGE(sliderVolumen), 60);
+    gtk_range_set_value(GTK_RANGE(sliderVolumen), 0.1);
     gtk_box_append(GTK_BOX(controlSonido), sliderVolumen);
+
+    g_signal_connect(sliderVolumen, "value-changed", G_CALLBACK(on_slider_volumen_cambiado), NULL);
 
     gtk_overlay_add_overlay(GTK_OVERLAY(overlaySonido), controlSonido);
     gtk_box_append(GTK_BOX(seccionSonido), overlaySonido);
@@ -68,9 +79,9 @@ GtkWidget* crearPantallaOpciones(void) {
     //se crean e introducen los botones de las naves
     for (int i = 1; i <= 4; i++) {
         char ruta[100];
-        char nombre[20];
+        char nombre[100];
         sprintf(ruta, "design/elementos/nave%d.svg", i);
-        sprintf(nombre, "nave%d", i);
+        sprintf(nombre, "design/elementos/nave%d.svg", i);
 
         GtkWidget *botonNave = gtk_button_new();
         gtk_widget_set_size_request(botonNave, 70, 70);
