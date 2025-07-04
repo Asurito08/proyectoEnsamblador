@@ -1,7 +1,17 @@
 #include "menu.h"
 #include "stackManager.h"
+#include "partida.h"  
 
-//Funcion para crear botones de cambio de pantalla
+// Función para iniciar la partida
+static void irPartida(GtkButton *btn, gpointer user_data) {
+    GtkWidget *pantalla = crearPantallaPartida();
+    agregarPantalla("partida", pantalla);
+    cambiarPantalla(NULL, "partida");
+    g_timeout_add(50, safe_grab_focus, pantalla);
+}
+
+
+// Función para crear botones de cambio de pantalla
 static GtkWidget* crearBotonMenu(const char *rutaImagen, const char *pantallaDestino) {
     GtkWidget *boton = gtk_button_new();
     GtkWidget *imagen = gtk_picture_new_for_filename(rutaImagen);
@@ -12,12 +22,17 @@ static GtkWidget* crearBotonMenu(const char *rutaImagen, const char *pantallaDes
     gtk_widget_set_focusable(boton, FALSE);
     gtk_widget_add_css_class(boton, "flat");
 
-    g_signal_connect(boton, "clicked", G_CALLBACK(cambiarPantalla), (gpointer)pantallaDestino);
+    
+    if (strcmp(pantallaDestino, "iniciarPartida") == 0) {
+        g_signal_connect(boton, "clicked", G_CALLBACK(irPartida), NULL);
+    } else {
+        g_signal_connect(boton, "clicked", G_CALLBACK(cambiarPantalla), (gpointer)pantallaDestino);
+    }
 
     return boton;
 }
 
-//Funcion para crear la pantalla menu, con todo su contenido adentro
+// Función para crear el menú principal
 GtkWidget* crearMenu(void) {
     GtkWidget *overlayMenu = gtk_overlay_new();
     gtk_widget_set_hexpand(overlayMenu, TRUE);
@@ -27,19 +42,20 @@ GtkWidget* crearMenu(void) {
     gtk_widget_set_halign(cajaMenu, GTK_ALIGN_CENTER);
     gtk_widget_set_valign(cajaMenu, GTK_ALIGN_CENTER);
 
-    //Insertando la imagen de titulo
+    // Imagen del título
     GtkWidget *imagenTitulo = gtk_picture_new_for_filename("design/elementos/titulo.svg");
     gtk_widget_set_size_request(imagenTitulo, 600, 250);
     gtk_picture_set_content_fit(GTK_PICTURE(imagenTitulo), GTK_CONTENT_FIT_CONTAIN);
     gtk_widget_set_margin_top(imagenTitulo, 50);
     gtk_box_append(GTK_BOX(cajaMenu), imagenTitulo);
 
+    // Caja de botones
     GtkWidget *cajaBotones = gtk_box_new(GTK_ORIENTATION_VERTICAL, 20);
     gtk_widget_set_halign(cajaBotones, GTK_ALIGN_CENTER);
     gtk_widget_set_margin_top(cajaBotones, 70);
 
-    // Creando los botones de cambios de pantalla
-    gtk_box_append(GTK_BOX(cajaBotones), crearBotonMenu("design/elementos/iniciarPartida.svg", "iniciar"));
+    // Otros botones
+    gtk_box_append(GTK_BOX(cajaBotones), crearBotonMenu("design/elementos/iniciarPartida.svg", "iniciarPartida"));
     gtk_box_append(GTK_BOX(cajaBotones), crearBotonMenu("design/elementos/puntuaciones.svg", "puntuaciones"));
     gtk_box_append(GTK_BOX(cajaBotones), crearBotonMenu("design/elementos/opciones.svg", "opciones"));
 

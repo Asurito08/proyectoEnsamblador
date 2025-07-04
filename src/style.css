@@ -18,3 +18,85 @@
         -1px  1px 0 #e03b00,
          1px  1px 0 #e03b00;
 }
+
+.texto_sin_borde {
+    font-family: 'C059', serif;
+    font-size: 40px;
+    font-weight: bold;
+    color: #305c38;
+    border: none;
+    background: transparent;
+    padding: 24px;
+    text-shadow:
+        -2px -2px 0 #e03b00,
+         0px -2px 0 #e03b00,
+         2px -2px 0 #e03b00,
+        -2px  0px 0 #e03b00,
+         2px  0px 0 #e03b00,
+        -2px  2px 0 #e03b00,
+         0px  2px 0 #e03b00,
+         2px  2px 0 #e03b00,
+        -1px -1px 0 #e03b00,
+         1px -1px 0 #e03b00,
+        -1px  1px 0 #e03b00,
+         1px  1px 0 #e03b00;
+}
+
+.texto_con_borde {
+    font-family: 'C059', serif;
+    font-size: 60px;
+    font-weight: bold;
+    color: #305c38;
+    border: 3px solid #305c38;
+    border-radius: 12px;
+    background: transparent;
+    padding: 24px;
+    text-shadow:
+        -2px -2px 0 #e03b00,
+         0px -2px 0 #e03b00,
+         2px -2px 0 #e03b00,
+        -2px  0px 0 #e03b00,
+         2px  0px 0 #e03b00,
+        -2px  2px 0 #e03b00,
+         0px  2px 0 #e03b00,
+         2px  2px 0 #e03b00,
+        -1px -1px 0 #e03b00,
+         1px -1px 0 #e03b00,
+        -1px  1px 0 #e03b00,
+         1px  1px 0 #e03b00;
+}
+
+.felicidades {
+    font-family: 'C059', serif;
+    font-size: 60px;
+    font-weight: bold;
+    color: #305c38;
+    text-shadow:
+    -2px -2px 0 #e03b00,
+     0px -2px 0 #e03b00,
+     2px -2px 0 #e03b00,
+    -2px  0px 0 #e03b00,
+     2px  0px 0 #e03b00,
+    -2px  2px 0 #e03b00,
+     0px  2px 0 #e03b00,
+     2px  2px 0 #e03b00,
+    -1px -1px 0 #e03b00,
+     1px -1px 0 #e03b00,
+    -1px  1px 0 #e03b00,
+     1px  1px 0 #e03b00;
+}
+
+button.flat {
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+button.flat:hover {
+    background-color: transparent;
+    box-shadow: none;
+}
+
+.texto_marcador_pequeno {
+    font-size: 34px;
+}

@@ -3,6 +3,7 @@
 #include "menu.h"
 #include "opciones.h"
 #include "puntuaciones.h"
+#include "partida.h"
 
 GtkCssProvider *cssProvider = NULL;
 
@@ -12,7 +13,7 @@ static void activate(GtkApplication *aplicacion, gpointer datosUsuario) {
     gtk_window_set_title(GTK_WINDOW(ventanaPrincipal), "Pantalla de Prueba");
     gtk_window_set_default_size(GTK_WINDOW(ventanaPrincipal), 1200, 900);
 
-    // Cargar css con estilo para nombres y puntuaciones
+    // Cargar CSS
     cssProvider = gtk_css_provider_new();
     GFile *file = g_file_new_for_path("src/style.css");
     gtk_css_provider_load_from_file(cssProvider, file);
@@ -34,20 +35,21 @@ static void activate(GtkApplication *aplicacion, gpointer datosUsuario) {
     gtk_picture_set_content_fit(GTK_PICTURE(fondo), GTK_CONTENT_FIT_COVER);
     gtk_overlay_set_child(GTK_OVERLAY(overlay), fondo);
 
-    // Crear stack de pantallas
+    // Crear stack
     stack = gtk_stack_new();
     gtk_widget_set_hexpand(stack, TRUE);
     gtk_widget_set_vexpand(stack, TRUE);
     gtk_overlay_add_overlay(GTK_OVERLAY(overlay), stack);
 
     // Agregar pantallas al stack
-    gtk_stack_add_named(GTK_STACK(stack), crearMenu(), "menu");
-    gtk_stack_add_named(GTK_STACK(stack), crearPantallaOpciones(), "opciones");
-    gtk_stack_add_named(GTK_STACK(stack), crearPantallaPuntuaciones(), "puntuaciones");
+    agregarPantalla("menu", crearMenu());
+    agregarPantalla("opciones", crearPantallaOpciones());
+    agregarPantalla("puntuaciones", crearPantallaPuntuaciones());
 
-    // Mostrar ventana
+    // Mostrar ventana (inicia en el menú por defecto)
     gtk_window_present(GTK_WINDOW(ventanaPrincipal));
 }
+
 int main(int argc, char **argv) {
     GtkApplication *aplicacion = gtk_application_new("com.proyecto.galaga", G_APPLICATION_DEFAULT_FLAGS);
 
