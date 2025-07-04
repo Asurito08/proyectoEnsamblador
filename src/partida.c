@@ -53,12 +53,6 @@ void pintar_matriz(void) {
         return;
     }
 
-    g_print("Matriz pintada:\n");
-    for (int k = 0; k < FILAS; k++) {
-        fwrite(matriz + k * ROWLEN, 1, COLS, stdout);
-        putchar('\n');
-    }
-
     for (int i = 0; i < FILAS; i++) {
         for (int j = 0; j < COLS; j++) {
             char c = matriz[i * ROWLEN + j];
@@ -68,8 +62,8 @@ void pintar_matriz(void) {
         } else {
             switch (c) {
                 case 'V': ruta = "design/elementos/nave1.svg"; break;
-                case 'X': ruta = "design/elementos/nave2.svg"; break;
-                case 'E': ruta = "design/elementos/nave3.svg"; break;
+                case 'X': ruta = "design/elementos/enemigosGalaga.png"; break;
+                case 'E': ruta = "design/elementos/enemigosGalaga.png"; break;
                 case '^': ruta = "design/elementos/bala.svg"; break;
                 case '0': ruta = "design/elementos/vacio.svg"; break;
                 default:
@@ -91,8 +85,6 @@ void pintar_matriz(void) {
 
         }
     }
-    printf("Pintando matriz en grid_dibujo\n");
-     printf("Verificando punteros de imagenes[][] antes del queue_draw...\n");
     for (int i = 0; i < FILAS; i++) {
         for (int j = 0; j < COLS; j++) {
             GtkWidget *widget = imagenes[i][j];
@@ -102,13 +94,11 @@ void pintar_matriz(void) {
         }
     }
 
-    printf("Verificando puntero de grid_dibujo...\n");
     if (!GTK_IS_GRID(grid_dibujo)) {
         printf("❌ grid_dibujo está dañado: %p\n", (void *)grid_dibujo);
     }
 
     gtk_widget_queue_draw(GTK_WIDGET(grid_dibujo));
-    printf("Matriz pintada correctamente\n");
 }
 
 void mostrar_marcador() {
@@ -160,7 +150,6 @@ gboolean capturar_tecla(GtkEventControllerKey *controller, guint keyval, guint k
 
     if (unicode != 0 && unicode <= 127) {
         char tecla = (char)unicode;
-        g_print("Tecla presionada: %c\n", tecla);
         tecla_buffer = tecla;
     }
 
@@ -190,7 +179,6 @@ gboolean loop_juego(gpointer user_data) {
         if (strchr("wasdpktyuizxcv", tecla)) {
             
             resultado = iterar_matriz(matriz, tecla);
-            g_print("Resultado ASM: %d\n", resultado);
 
             switch (resultado) {
                 case 0:
@@ -204,18 +192,15 @@ gboolean loop_juego(gpointer user_data) {
                     mostrar_marcador();
                     break;
                 case 3:
-                    g_print("Ganaste, ya no quedan enemigos\n");
                     gtk_window_close(GTK_WINDOW(gtk_widget_get_root(GTK_WIDGET(grid_dibujo))));
                     return FALSE;
                 case -1:
-                    g_print("Movimiento inválido o sin cambio\n");
                     break;
                 default:
                     break;
             }
-            printf("hola");
             pintar_matriz();
-            printf("adios");
+
         }
     }
     return TRUE;
