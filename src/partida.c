@@ -14,6 +14,7 @@
 #define RUTA_ARCHIVO2 "saves/nive2.txt"
 #define RUTA_ARCHIVO3 "saves/nive3.txt"
 
+extern char *naveElegida;
 
 int vidas = 5;
 int marcador_timer_id = 0;
@@ -61,7 +62,12 @@ void pintar_matriz(void) {
             ruta = "design/elementos/vacio.svg";
         } else {
             switch (c) {
-                case 'V': ruta = "design/elementos/nave1.svg"; break;
+                // char destino[100] = "desing/elementos/";
+                // char *svg =  ".svg";
+                // strcat(destino, naveElegida);
+                // strcat(destino, svg);
+                case 'V': ruta = naveElegida; break;
+                // case 'V': ruta = "design/elementos/nave2.svg"; break;
                 case 'X': ruta = "design/elementos/enemigosGalaga.png"; break;
                 case 'E': ruta = "design/elementos/enemigosGalaga.png"; break;
                 case '^': ruta = "design/elementos/bala.svg"; break;
