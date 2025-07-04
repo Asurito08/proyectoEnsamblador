@@ -3,7 +3,9 @@
 
 #include <gtk/gtk.h>
 #include "stackManager.h"
-//#include "pausa.h"
+#include "pausa.h"
+#include "victoria.h"
+#include "derrota.h"
 
 GtkWidget* crearPantallaPartida(void);
 gboolean loop_juego(gpointer data);

@@ -39,7 +39,7 @@ static void reiniciarPartida(GtkButton *btn, gpointer user_data) {
 }
 
 // Callback para salir al menú principal
-static void salirAlMenu(GtkButton *btn, gpointer user_data) {
+void salirAlMenu(GtkButton *btn, gpointer user_data) {
 GtkWidget *pantalla = gtk_stack_get_child_by_name(GTK_STACK(stack), "partida");    if (pantalla) {
     if (marcador_timer_id != 0) {
         g_source_remove(marcador_timer_id);

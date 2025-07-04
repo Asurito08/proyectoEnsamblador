@@ -145,6 +145,19 @@ void mostrar_pausa(GtkWindow *parent) {
     cambiarPantalla(NULL, "pausa");
 }
 
+void mostrar_derrota(GtkWindow *parent) {
+    GtkWidget *pantalla_derrota = crearPantallaDerrota();
+    agregarPantalla("derrota", pantalla_derrota);
+    cambiarPantalla(NULL, "derrota");
+}
+
+void mostrar_victoria(GtkWindow *parent) {
+    GtkWidget *pantalla_victoria = crearPantallaVictoria();
+    agregarPantalla("victoria", pantalla_victoria);
+    cambiarPantalla(NULL, "victoria");
+}
+
+
 gboolean capturar_tecla(GtkEventControllerKey *controller, guint keyval, guint keycode, GdkModifierType state, gpointer user_data) {
     gunichar unicode = gdk_keyval_to_unicode(keyval);
 
@@ -175,26 +188,51 @@ gboolean loop_juego(gpointer user_data) {
             return TRUE;
         }
 
-            int resultado;
+        int resultado;
         if (strchr("wasdpktyuizxcv", tecla)) {
             
             resultado = iterar_matriz(matriz, tecla);
 
             switch (resultado) {
-                case 0:
+                case 0://valido
                     break;
-                case 1:
+                case 1://se toca un enemigo y se resta una vida
                     vidas -= 1;
+                    if (vidas <= 0) {
+                        vidas = 0;
+                        mostrar_derrota(GTK_WINDOW(gtk_widget_get_root(GTK_WIDGET(grid_dibujo))));
+                        if (partida_timer_id != 0) {
+                            g_source_remove(partida_timer_id);
+                            partida_timer_id = 0;
+                        }
+                        if (marcador_timer_id != 0) {
+                            g_source_remove(marcador_timer_id);
+                            marcador_timer_id = 0;
+                        }
+                        marcador = 0;
+                        vidas = 5;
+                        return FALSE;
+                    }
                     actualizar_widget_vidas(vidas);
                     break;
-                case 2:
+                case 2://se elimina un enemigo y se suma al marcador
                     marcador += 3;
                     mostrar_marcador();
                     break;
-                case 3:
-                    gtk_window_close(GTK_WINDOW(gtk_widget_get_root(GTK_WIDGET(grid_dibujo))));
+                case 3://ya no hay enemigos
+                    marcador += 3;
+                    mostrar_victoria(GTK_WINDOW(gtk_widget_get_root(GTK_WIDGET(grid_dibujo))));
+                     if (partida_timer_id != 0) {
+                        g_source_remove(partida_timer_id);
+                        partida_timer_id = 0;
+                    }
+                    if (marcador_timer_id != 0) {
+                        g_source_remove(marcador_timer_id);
+                        marcador_timer_id = 0;
+                    }
+                    marcador = 0;
                     return FALSE;
-                case -1:
+                case -1://invalido
                     break;
                 default:
                     break;
@@ -273,8 +311,15 @@ GtkWidget* crearPantallaPartida(void) {
 
     gtk_widget_set_focusable(overlay, TRUE);
 
-    if (partida_timer_id != 0) g_source_remove(partida_timer_id);
-    if (marcador_timer_id != 0) g_source_remove(marcador_timer_id);
+   
+    if (partida_timer_id != 0) {
+        g_source_remove(partida_timer_id);
+        partida_timer_id = 0;
+    }
+    if (marcador_timer_id != 0) {
+        g_source_remove(marcador_timer_id);
+        marcador_timer_id = 0;
+    }
     partida_timer_id = g_timeout_add(50, loop_juego, NULL);
     marcador_timer_id = g_timeout_add_seconds(3, actualizar_marcador, NULL);
 
